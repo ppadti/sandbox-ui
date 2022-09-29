@@ -323,6 +323,12 @@ describe("Instances Test", () => {
             cy.ouiaId("instance-details-published-date")
               .should("have.text", formatDate("2022-02-24T13:35:00Z"))
               .should("be.visible");
+            cy.ouiaId("instance-details-cloud-provider")
+              .should("have.text", "Amazon Web Services")
+              .should("be.visible");
+            cy.ouiaId("instance-details-cloud-region")
+              .should("have.text", "US East, N. Virginia")
+              .should("be.visible");
             cy.ouiaId("close-instance-details").click();
           })
           //constructions like "not.exist" or "not.be.visible" fail in this case
