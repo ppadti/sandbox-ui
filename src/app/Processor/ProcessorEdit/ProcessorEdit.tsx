@@ -12,6 +12,7 @@ import {
   AlertGroup,
   Button,
   Form,
+  FormAlert,
   FormGroup,
   FormSection,
   Grid,
@@ -139,6 +140,7 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
   const actionModalFn = useRef<() => void>((): void =>
     setShowActionModal(false)
   );
+  const [errors, setErrors] = useState<boolean>(false);
 
   const resetActionOrSource = useCallback(() => {
     if (processorType === ProcessorType.Source) {
@@ -149,6 +151,7 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
   }, [processorType]);
 
   useEffect(() => {
+    setErrors(false);
     let type;
     if (processorType === ProcessorType.Source && source.type) {
       type = source.type;
@@ -236,6 +239,9 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
 
   useEffect(() => {
     if (isSubmitted || malformedTransformationTemplate) {
+      if (!validate()) {
+        setErrors(true);
+      }
       document
         .querySelector(".processor-field-error, .pf-m-error")
         ?.scrollIntoView({
@@ -245,7 +251,7 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
         });
       setIsSubmitted(false);
     }
-  }, [isSubmitted, malformedTransformationTemplate]);
+  }, [isSubmitted, malformedTransformationTemplate, validate]);
 
   return (
     <PageSection
@@ -277,6 +283,18 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
         contentId={"processor-form-container"}
       >
         <Form className={"processor-edit__form"} autoComplete="off">
+          {(validation.errors.name ||
+            validation.errors.processorType ||
+            errors) && (
+            <FormAlert>
+              <Alert
+                variant="danger"
+                title="Address form errors to proceed."
+                aria-live="polite"
+                isInline
+              />
+            </FormAlert>
+          )}
           <FormSection
             title={t("processor.generalInformation")}
             titleElement="h2"
@@ -388,7 +406,14 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
                     configType={ProcessorSchemaType.SOURCE}
                     source={source}
                     registerValidation={registerValidateConfig}
-                    onChange={setSource}
+                    onChange={(src): void => {
+                      setSource(src);
+                      if (schema !== undefined && !validate()) {
+                        setErrors(true);
+                      } else {
+                        setErrors(false);
+                      }
+                    }}
                     editMode={isExistingProcessor}
                     schemaCatalog={schemaCatalog}
                     schema={schema}
@@ -480,7 +505,15 @@ const ProcessorEdit = (props: ProcessorEditProps): JSX.Element => {
                       configType={ProcessorSchemaType.ACTION}
                       action={action}
                       registerValidation={registerValidateConfig}
-                      onChange={setAction}
+                      onChange={(act): void => {
+                        if (schema !== undefined && !validate()) {
+                          setErrors(true);
+                        } else {
+                          setErrors(false);
+                        }
+
+                        setAction(act);
+                      }}
                       editMode={isExistingProcessor}
                       schemaCatalog={schemaCatalog}
                       schema={schema}
