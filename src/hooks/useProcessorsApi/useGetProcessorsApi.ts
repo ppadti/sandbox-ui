@@ -3,7 +3,6 @@ import {
   ManagedResourceStatus,
   ProcessorListResponse,
   ProcessorsApi,
-  ProcessorType,
 } from "@rhoas/smart-events-management-sdk";
 import { useCallback, useRef, useState } from "react";
 import axios, { CancelTokenSource } from "axios";
@@ -14,7 +13,6 @@ export function useGetProcessorsApi(): {
     bridgeId: string,
     pageReq?: number,
     sizeReq?: number,
-    processorType?: ProcessorType,
     isPolling?: boolean
   ) => void;
   processorListResponse?: ProcessorListResponse;
@@ -33,7 +31,6 @@ export function useGetProcessorsApi(): {
       bridgeId: string,
       pageReq?: number,
       sizeReq?: number,
-      processorType?: ProcessorType,
       isPolling?: boolean
     ): void => {
       setIsLoading(!isPolling); // no loading, when the call is generated from a polling
@@ -50,13 +47,12 @@ export function useGetProcessorsApi(): {
         })
       );
       processorsApi
-        .listProcessors(
+        .getProcessors(
           bridgeId,
           undefined,
           pageReq,
           sizeReq,
           new Set<ManagedResourceStatus>(),
-          processorType ?? undefined,
           {
             cancelToken: source.token,
           }

@@ -158,8 +158,7 @@ export const ProcessorsTabContent = ({
   );
 
   const triggerGetProcessors = useCallback(
-    (): void =>
-      getProcessors(instanceId, currentPage, currentPageSize, undefined, true),
+    (): void => getProcessors(instanceId, currentPage, currentPageSize, true),
     [currentPage, currentPageSize, getProcessors, instanceId]
   );
 
